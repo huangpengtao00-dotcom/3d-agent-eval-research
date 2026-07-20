@@ -64,6 +64,7 @@ def test_duplicate_standard_view_destinations_are_rejected() -> None:
         "byte_length": 0,
         "renderer": "fixed-renderer",
         "renderer_version": "1.0.0",
+        "render_protocol_digest": "f" * 64,
         "parameters": {},
     }
     payload["standard_views"] = [view, view]

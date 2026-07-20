@@ -43,6 +43,7 @@ def write_complete_source(source: Path) -> None:
             "byte_length": 3,
             "renderer": "fixed-renderer",
             "renderer_version": "1.0.0",
+            "render_protocol_digest": "f" * 64,
             "parameters": {"projection": "perspective"},
         }
         for name in ("front", "back", "left", "right", "top", "isometric")

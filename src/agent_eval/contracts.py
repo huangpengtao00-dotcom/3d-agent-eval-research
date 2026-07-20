@@ -49,6 +49,8 @@ class AuditIssueCode(StrEnum):
     MISSING_ROUND_SIMULATOR_CALL_RECORD = "missing_round_simulator_call_record"
     INVALID_EVIDENCE_REFERENCE = "invalid_evidence_reference"
     UNSUPPORTED_ARTIFACT_FORMAT = "unsupported_artifact_format"
+    BROKEN_TRAJECTORY_REFERENCE = "broken_trajectory_reference"
+    INCONSISTENT_TRAJECTORY_ORDER = "inconsistent_trajectory_order"
 
 
 class ExperimentSnapshot(StrictModel):
@@ -65,6 +67,7 @@ class RunSnapshot(StrictModel):
     skill_digests: dict[str, Sha256]
     simulator: dict[str, Any]
     random_seed: int | None = None
+    simulator_invocation_count: int | None = Field(default=None, ge=0)
 
 
 class AttemptSnapshot(StrictModel):
@@ -130,6 +133,7 @@ class StandardViewSource(StrictModel):
     byte_length: int = Field(ge=0)
     renderer: str = Field(min_length=1)
     renderer_version: str = Field(min_length=1)
+    render_protocol_digest: Sha256 | None = None
     parameters: dict[str, Any]
 
 
@@ -138,6 +142,7 @@ class SourceSnapshot(StrictModel):
     trajectory_id: SafeIdentifier
     case_family_key: str = Field(min_length=1)
     split_group_key: str = Field(min_length=1)
+    research_data_approved: bool | None = None
     experiment: ExperimentSnapshot
     run: RunSnapshot
     attempt: AttemptSnapshot

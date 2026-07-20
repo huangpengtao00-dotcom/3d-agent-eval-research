@@ -3,6 +3,7 @@
   "trajectory_id": "trajectory-001",
   "case_family_key": "printable-character",
   "split_group_key": "family-001",
+  "research_data_approved": true,
   "experiment": {
     "snapshot_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "dataset_content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -15,6 +16,7 @@
     "toolset_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     "skill_digests": {"printability": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
     "simulator": {"model": "simulator-model", "temperature": 0.0},
+    "simulator_invocation_count": 1,
     "random_seed": null
   },
   "attempt": {
@@ -79,6 +81,7 @@
       "byte_length": 4,
       "renderer": "fixed-renderer",
       "renderer_version": "1.0.0",
+      "render_protocol_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "parameters": {"projection": "perspective"}
     },
     {
@@ -90,6 +93,7 @@
       "byte_length": 4,
       "renderer": "fixed-renderer",
       "renderer_version": "1.0.0",
+      "render_protocol_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "parameters": {"projection": "perspective"}
     },
     {
@@ -101,6 +105,7 @@
       "byte_length": 4,
       "renderer": "fixed-renderer",
       "renderer_version": "1.0.0",
+      "render_protocol_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "parameters": {"projection": "perspective"}
     },
     {
@@ -112,6 +117,7 @@
       "byte_length": 4,
       "renderer": "fixed-renderer",
       "renderer_version": "1.0.0",
+      "render_protocol_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "parameters": {"projection": "perspective"}
     },
     {
@@ -123,6 +129,7 @@
       "byte_length": 4,
       "renderer": "fixed-renderer",
       "renderer_version": "1.0.0",
+      "render_protocol_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "parameters": {"projection": "perspective"}
     },
     {
@@ -134,6 +141,7 @@
       "byte_length": 4,
       "renderer": "fixed-renderer",
       "renderer_version": "1.0.0",
+      "render_protocol_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       "parameters": {"projection": "perspective"}
     }
   ]

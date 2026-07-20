@@ -4,6 +4,7 @@ def minimum_snapshot() -> dict[str, object]:
         "trajectory_id": "trajectory-001",
         "case_family_key": "printable-character",
         "split_group_key": "family-001",
+        "research_data_approved": True,
         "experiment": {
             "snapshot_hash": "a" * 64,
             "dataset_content_hash": "b" * 64,
@@ -16,6 +17,7 @@ def minimum_snapshot() -> dict[str, object]:
             "toolset_digest": "d" * 64,
             "skill_digests": {"printability": "e" * 64},
             "simulator": {"model": "simulator-model", "temperature": 0.0},
+            "simulator_invocation_count": 0,
         },
         "attempt": {
             "attempt_id": "attempt-001",
