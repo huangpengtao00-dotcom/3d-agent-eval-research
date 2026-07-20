@@ -154,9 +154,17 @@ class SourceSnapshot(StrictModel):
         artifact_ids = [artifact.artifact_id for artifact in self.artifacts]
         if len(artifact_ids) != len(set(artifact_ids)):
             raise ValueError("duplicate artifact_id")
+        folded_artifact_ids = [artifact_id.casefold() for artifact_id in artifact_ids]
+        if len(folded_artifact_ids) != len(set(folded_artifact_ids)):
+            raise ValueError("case-insensitive artifact_id collision")
         view_keys = [(view.artifact_id, view.view_name) for view in self.standard_views]
         if len(view_keys) != len(set(view_keys)):
             raise ValueError("duplicate standard view")
+        folded_view_keys = [
+            (artifact_id.casefold(), view_name.casefold()) for artifact_id, view_name in view_keys
+        ]
+        if len(folded_view_keys) != len(set(folded_view_keys)):
+            raise ValueError("case-insensitive standard view collision")
         return self
 
 

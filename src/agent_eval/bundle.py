@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import shutil
 from collections.abc import Iterable
 from pathlib import Path
+from tempfile import mkdtemp
 from typing import Any
 
 from agent_eval import __version__
@@ -74,15 +76,51 @@ def build_bundle(
 ) -> Path:
     snapshot_path = source_root / "snapshot.json"
     snapshot = load_source_snapshot(snapshot_path)
+    output_root.mkdir(parents=True, exist_ok=True)
+    destination = output_root / snapshot.trajectory_id
+    folded_id = snapshot.trajectory_id.casefold()
+    collision = next(
+        (child for child in output_root.iterdir() if child.name.casefold() == folded_id),
+        None,
+    )
+    if collision is not None:
+        raise FileExistsError(f"case-insensitive bundle collision: {collision}")
+
+    staging = Path(mkdtemp(prefix=f".{snapshot.trajectory_id}.", dir=output_root))
+    try:
+        _assemble_bundle(snapshot, source_root, staging, disclosure_class)
+        staging.rename(destination)
+    except BaseException:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
+
+    manifest = BundleManifest.model_validate_json(
+        (destination / "manifest.json").read_text(encoding="utf-8")
+    )
+    if manifest.data_quality.status is DataQualityStatus.EXCLUDED:
+        exclusion_path = output_root / "excluded" / f"{snapshot.trajectory_id}.json"
+        _write_json(
+            exclusion_path,
+            {
+                "trajectory_id": snapshot.trajectory_id,
+                "source_snapshot_sha256": manifest.source_snapshot_sha256,
+                "data_quality": manifest.data_quality.model_dump(mode="json"),
+            },
+        )
+    return destination
+
+
+def _assemble_bundle(
+    snapshot: SourceSnapshot,
+    source_root: Path,
+    bundle: Path,
+    disclosure_class: DisclosureClass,
+) -> None:
     audit = audit_snapshot(snapshot, source_root)
     try:
         round_turns = resolve_round_turns(snapshot)
     except AmbiguousRoundTurnMapping:
         round_turns = None
-    bundle = output_root / snapshot.trajectory_id
-    if bundle.exists():
-        raise FileExistsError(f"bundle already exists: {bundle}")
-    bundle.mkdir(parents=True)
 
     normalized_rounds = [
         round_record
@@ -162,14 +200,3 @@ def build_bundle(
     manifest_path = bundle / "manifest.json"
     _write_json(manifest_path, manifest.model_dump(mode="json"))
     write_checksum_file(bundle, [path for path in bundle.rglob("*") if path.is_file()])
-    if audit.status is DataQualityStatus.EXCLUDED:
-        exclusion_path = output_root / "excluded" / f"{snapshot.trajectory_id}.json"
-        _write_json(
-            exclusion_path,
-            {
-                "trajectory_id": snapshot.trajectory_id,
-                "source_snapshot_sha256": manifest.source_snapshot_sha256,
-                "data_quality": audit.model_dump(mode="json"),
-            },
-        )
-    return bundle

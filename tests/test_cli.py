@@ -115,3 +115,16 @@ def test_partial_fixture_preserves_content_quality_eligibility(tmp_path: Path) -
     payload = json.loads(result.stdout)
     assert payload["status"] == "partial"
     assert payload["issues"] == ["missing_round_simulator_call_record"]
+
+
+def test_audit_command_fails_for_valid_excluded_bundle(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    write_complete_source(source)
+    (source / "files/model.glb").unlink()
+    build_result = runner.invoke(app, ["bundle", str(source), str(output)])
+    assert build_result.exit_code == 2
+
+    result = runner.invoke(app, ["audit", str(output / "trajectory-001")])
+    assert result.exit_code == 2
+    assert json.loads(result.stdout)["status"] == "excluded"

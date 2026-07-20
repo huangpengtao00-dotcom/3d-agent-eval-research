@@ -69,3 +69,23 @@ def test_duplicate_standard_view_destinations_are_rejected() -> None:
     payload["standard_views"] = [view, view]
     with pytest.raises(ValidationError, match="duplicate standard view"):
         SourceSnapshot.model_validate(payload)
+
+
+def test_casefolded_artifact_destinations_are_rejected() -> None:
+    payload = minimum_snapshot()
+    artifact = {
+        "kind": "model",
+        "relative_path": "files/model.glb",
+        "media_type": "model/gltf-binary",
+        "sha256": "0" * 64,
+        "byte_length": 0,
+        "producing_turn_id": "turn-001",
+        "producing_step_id": "step-001",
+        "required": True,
+    }
+    payload["artifacts"] = [
+        {**artifact, "artifact_id": "Artifact"},
+        {**artifact, "artifact_id": "artifact"},
+    ]
+    with pytest.raises(ValidationError, match="case-insensitive artifact_id"):
+        SourceSnapshot.model_validate(payload)

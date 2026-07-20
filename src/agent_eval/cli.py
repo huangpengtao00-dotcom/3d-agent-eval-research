@@ -47,3 +47,5 @@ def audit(bundle_path: Path) -> None:
         typer.echo(json.dumps({"status": "excluded", "issues": ["bundle_checksum_incomplete"]}))
         raise typer.Exit(2) from None
     typer.echo(manifest.data_quality.model_dump_json())
+    if manifest.data_quality.status is DataQualityStatus.EXCLUDED:
+        raise typer.Exit(2)
