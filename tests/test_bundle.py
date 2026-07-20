@@ -39,3 +39,38 @@ def test_build_bundle_freezes_source_and_bytes(tmp_path: Path) -> None:
     assert (bundle / "artifacts/inventory.json").is_file()
     assert (bundle / "views/render_manifest.json").is_file()
     assert verify_checksum_file(bundle) == []
+
+
+def test_missing_artifact_builds_excluded_bundle_and_index(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    source.mkdir()
+    payload = minimum_snapshot()
+    payload["steps"] = [
+        {"step_id": "step-001", "turn_id": "turn-001", "payload": {"tool": "generate"}}
+    ]
+    payload["lineage"] = [
+        {"parent_id": "step-001", "child_id": "artifact-001", "relation": "produced"}
+    ]
+    payload["artifacts"] = [
+        {
+            "artifact_id": "artifact-001",
+            "kind": "model",
+            "relative_path": "files/missing.glb",
+            "media_type": "model/gltf-binary",
+            "sha256": "0" * 64,
+            "byte_length": 0,
+            "producing_turn_id": "turn-001",
+            "producing_step_id": "step-001",
+            "required": True,
+        }
+    ]
+    (source / "snapshot.json").write_text(json.dumps(payload), encoding="utf-8")
+
+    bundle = build_bundle(source, output, DisclosureClass.PRIVATE_REPRODUCIBLE)
+
+    manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["data_quality"]["status"] == "excluded"
+    assert "missing_required_artifact" in manifest["data_quality"]["issues"]
+    assert (output / "excluded/trajectory-001.json").is_file()
+    assert verify_checksum_file(bundle) == []

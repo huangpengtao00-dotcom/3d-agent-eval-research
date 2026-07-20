@@ -5,7 +5,13 @@ from pathlib import Path
 from typing import Any
 
 from agent_eval import __version__
-from agent_eval.artifacts import import_artifacts, import_standard_views
+from agent_eval.artifacts import (
+    EvidenceHashMismatch,
+    UnsafeSourcePath,
+    import_artifacts,
+    import_standard_views,
+)
+from agent_eval.audit import audit_snapshot
 from agent_eval.canonical import (
     canonical_json_bytes,
     sha256_bytes,
@@ -13,15 +19,14 @@ from agent_eval.canonical import (
     write_checksum_file,
 )
 from agent_eval.contracts import (
-    AuditIssueCode,
-    AuditResult,
     BundleManifest,
     DataQualityStatus,
     DisclosureClass,
     FileRecord,
+    SourceSnapshot,
     load_source_snapshot,
 )
-from agent_eval.mapping import resolve_round_turns
+from agent_eval.mapping import AmbiguousRoundTurnMapping, resolve_round_turns
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -43,6 +48,25 @@ def _file_record(root: Path, path: Path, media_type: str) -> FileRecord:
     )
 
 
+def _import_available_evidence(
+    source_root: Path,
+    bundle: Path,
+    snapshot: SourceSnapshot,
+) -> list[FileRecord]:
+    records: list[FileRecord] = []
+    for artifact in snapshot.artifacts:
+        try:
+            records.extend(import_artifacts(source_root, bundle, [artifact]))
+        except (EvidenceHashMismatch, FileNotFoundError, UnsafeSourcePath):
+            continue
+    for view in snapshot.standard_views:
+        try:
+            records.extend(import_standard_views(source_root, bundle, [view]))
+        except (EvidenceHashMismatch, FileNotFoundError, UnsafeSourcePath):
+            continue
+    return records
+
+
 def build_bundle(
     source_root: Path,
     output_root: Path,
@@ -50,14 +74,20 @@ def build_bundle(
 ) -> Path:
     snapshot_path = source_root / "snapshot.json"
     snapshot = load_source_snapshot(snapshot_path)
-    round_turns = resolve_round_turns(snapshot)
+    audit = audit_snapshot(snapshot, source_root)
+    try:
+        round_turns = resolve_round_turns(snapshot)
+    except AmbiguousRoundTurnMapping:
+        round_turns = None
     bundle = output_root / snapshot.trajectory_id
     if bundle.exists():
         raise FileExistsError(f"bundle already exists: {bundle}")
     bundle.mkdir(parents=True)
 
     normalized_rounds = [
-        round_record.model_copy(update={"turn_ids": list(round_turns[round_record.round_no])})
+        round_record
+        if round_turns is None
+        else round_record.model_copy(update={"turn_ids": list(round_turns[round_record.round_no])})
         for round_record in snapshot.rounds
     ]
     source_files: list[tuple[Path, str]] = [
@@ -100,10 +130,13 @@ def build_bundle(
             _file_record(bundle, render_manifest_path, "application/json"),
         ]
     )
-    records.extend(import_artifacts(source_root, bundle, snapshot.artifacts))
-    records.extend(import_standard_views(source_root, bundle, snapshot.standard_views))
+    records.extend(_import_available_evidence(source_root, bundle, snapshot))
 
-    provisional = BundleManifest(
+    audit_path = bundle / "quality" / "audit.json"
+    _write_json(audit_path, audit.model_dump(mode="json"))
+    records.append(_file_record(bundle, audit_path, "application/json"))
+
+    manifest = BundleManifest(
         trajectory_id=snapshot.trajectory_id,
         source_schema_version=snapshot.schema_version,
         case_family_key=snapshot.case_family_key,
@@ -124,13 +157,19 @@ def build_bundle(
         exporter_parameters={"disclosure_class": disclosure_class.value},
         disclosure_class=disclosure_class,
         files=records,
-        data_quality=AuditResult(
-            status=DataQualityStatus.PARTIAL,
-            issues=[AuditIssueCode.AUDIT_NOT_RUN],
-            eligible_analyses=[],
-        ),
+        data_quality=audit,
     )
     manifest_path = bundle / "manifest.json"
-    _write_json(manifest_path, provisional.model_dump(mode="json"))
+    _write_json(manifest_path, manifest.model_dump(mode="json"))
     write_checksum_file(bundle, [path for path in bundle.rglob("*") if path.is_file()])
+    if audit.status is DataQualityStatus.EXCLUDED:
+        exclusion_path = output_root / "excluded" / f"{snapshot.trajectory_id}.json"
+        _write_json(
+            exclusion_path,
+            {
+                "trajectory_id": snapshot.trajectory_id,
+                "source_snapshot_sha256": manifest.source_snapshot_sha256,
+                "data_quality": audit.model_dump(mode="json"),
+            },
+        )
     return bundle
