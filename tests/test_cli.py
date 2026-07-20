@@ -82,3 +82,25 @@ def test_audit_command_fails_cleanly_when_manifest_is_missing(tmp_path: Path) ->
     result = runner.invoke(app, ["audit", str(bundle)])
     assert result.exit_code == 2
     assert json.loads(result.stdout)["issues"] == ["bundle_checksum_incomplete"]
+
+
+def test_complete_fixture_builds_clean_bundle(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["bundle", "tests/fixtures/source_complete", str(tmp_path / "bundles")],
+    )
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "complete"
+    assert payload["issues"] == []
+
+
+def test_partial_fixture_preserves_content_quality_eligibility(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["bundle", "tests/fixtures/source_partial", str(tmp_path / "bundles")],
+    )
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "partial"
+    assert payload["issues"] == ["missing_round_simulator_call_record"]

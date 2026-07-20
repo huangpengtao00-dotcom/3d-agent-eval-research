@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "trajectory_id": "trajectory-001",
+  "case_family_key": "printable-character",
+  "split_group_key": "family-001",
+  "experiment": {
+    "snapshot_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "dataset_content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "snapshot_at": "2026-01-01T00:00:00Z",
+    "case_spec": {"goal": "Create a printable character"}
+  },
+  "run": {
+    "agent_version": "1.2.3",
+    "agent_config_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "toolset_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "skill_digests": {"printability": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+    "simulator": {"model": "simulator-model", "temperature": 0.0},
+    "random_seed": null
+  },
+  "attempt": {
+    "attempt_id": "attempt-001",
+    "attempt_no": 1,
+    "thread_id": "thread-001",
+    "state": "succeeded",
+    "termination_reason": "goal_achieved",
+    "source_quality_issues": []
+  },
+  "rounds": [
+    {
+      "round_no": 1,
+      "submitted_blocks": [{"type": "text", "text": "Create it"}],
+      "turn_ids": ["turn-001"],
+      "observations": [],
+      "simulator_calls": []
+    }
+  ],
+  "turns": [
+    {
+      "turn_id": "turn-001",
+      "idempotency_key": "attempt-001:r1",
+      "state": "succeeded"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "step-001",
+      "turn_id": "turn-001",
+      "payload": {"tool": "generate"}
+    }
+  ],
+  "events": [],
+  "lineage": [
+    {
+      "parent_id": "step-001",
+      "child_id": "artifact-001",
+      "relation": "produced"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact-001",
+      "kind": "model",
+      "relative_path": "files/model.glb",
+      "media_type": "model/gltf-binary",
+      "sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "byte_length": 6,
+      "producing_turn_id": "turn-001",
+      "producing_step_id": "step-001",
+      "required": true
+    }
+  ],
+  "standard_views": [
+    {
+      "artifact_id": "artifact-001",
+      "view_name": "front",
+      "relative_path": "views/front.png",
+      "source_artifact_sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "sha256": "33d8344a7135c42aa3876706b908f95b702d83ff53e05e4aaff17c07bf67a98e",
+      "byte_length": 4,
+      "renderer": "fixed-renderer",
+      "renderer_version": "1.0.0",
+      "parameters": {"projection": "perspective"}
+    },
+    {
+      "artifact_id": "artifact-001",
+      "view_name": "back",
+      "relative_path": "views/back.png",
+      "source_artifact_sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "sha256": "33d8344a7135c42aa3876706b908f95b702d83ff53e05e4aaff17c07bf67a98e",
+      "byte_length": 4,
+      "renderer": "fixed-renderer",
+      "renderer_version": "1.0.0",
+      "parameters": {"projection": "perspective"}
+    },
+    {
+      "artifact_id": "artifact-001",
+      "view_name": "left",
+      "relative_path": "views/left.png",
+      "source_artifact_sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "sha256": "33d8344a7135c42aa3876706b908f95b702d83ff53e05e4aaff17c07bf67a98e",
+      "byte_length": 4,
+      "renderer": "fixed-renderer",
+      "renderer_version": "1.0.0",
+      "parameters": {"projection": "perspective"}
+    },
+    {
+      "artifact_id": "artifact-001",
+      "view_name": "right",
+      "relative_path": "views/right.png",
+      "source_artifact_sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "sha256": "33d8344a7135c42aa3876706b908f95b702d83ff53e05e4aaff17c07bf67a98e",
+      "byte_length": 4,
+      "renderer": "fixed-renderer",
+      "renderer_version": "1.0.0",
+      "parameters": {"projection": "perspective"}
+    },
+    {
+      "artifact_id": "artifact-001",
+      "view_name": "top",
+      "relative_path": "views/top.png",
+      "source_artifact_sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "sha256": "33d8344a7135c42aa3876706b908f95b702d83ff53e05e4aaff17c07bf67a98e",
+      "byte_length": 4,
+      "renderer": "fixed-renderer",
+      "renderer_version": "1.0.0",
+      "parameters": {"projection": "perspective"}
+    },
+    {
+      "artifact_id": "artifact-001",
+      "view_name": "isometric",
+      "relative_path": "views/isometric.png",
+      "source_artifact_sha256": "98ad61a25e3683b6adf2474b01bbe1c27de6aad2ce3a80ff4140fe473c14e691",
+      "sha256": "33d8344a7135c42aa3876706b908f95b702d83ff53e05e4aaff17c07bf67a98e",
+      "byte_length": 4,
+      "renderer": "fixed-renderer",
+      "renderer_version": "1.0.0",
+      "parameters": {"projection": "perspective"}
+    }
+  ]
+}
