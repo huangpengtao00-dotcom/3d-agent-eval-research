@@ -1,0 +1,41 @@
+[project]
+name = "evidence-grounded-3d-agent-eval"
+version = "0.1.0"
+description = "Source-neutral research pipeline for evidence-grounded 3D agent evaluation"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.11,<3",
+  "typer>=0.16,<1",
+]
+
+[project.scripts]
+agent-eval = "agent_eval.cli:app"
+
+[dependency-groups]
+dev = [
+  "mypy>=1.17,<2",
+  "pytest>=8.4,<9",
+  "ruff>=0.12,<1",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_eval"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["agent_eval"]

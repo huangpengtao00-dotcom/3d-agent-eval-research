@@ -1,1 +1,14 @@
 .worktrees/
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# Raw and restricted research data must stay in access-controlled storage.
+data/private/
+bundles/
+excluded/
+*.secrets.json
