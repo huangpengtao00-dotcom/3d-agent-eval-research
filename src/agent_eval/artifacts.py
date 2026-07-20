@@ -34,10 +34,14 @@ def _copy(
     expected_sha256: str,
     expected_byte_length: int,
 ) -> FileRecord:
-    if source.stat().st_size != expected_byte_length or sha256_file(source) != expected_sha256:
-        raise EvidenceHashMismatch(source.as_posix())
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(source, destination)
+    if (
+        destination.stat().st_size != expected_byte_length
+        or sha256_file(destination) != expected_sha256
+    ):
+        destination.unlink(missing_ok=True)
+        raise EvidenceHashMismatch(source.as_posix())
     return FileRecord(
         relative_path=destination.relative_to(root).as_posix(),
         sha256=sha256_file(destination),

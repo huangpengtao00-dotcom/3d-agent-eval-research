@@ -3,6 +3,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from agent_eval.canonical import write_checksum_file
 from agent_eval.cli import app
 from tests.helpers import minimum_snapshot
 
@@ -79,6 +80,16 @@ def test_audit_command_fails_cleanly_when_manifest_is_missing(tmp_path: Path) ->
     bundle = tmp_path / "bundle"
     bundle.mkdir()
     (bundle / "checksums.sha256").write_text("", encoding="utf-8")
+    result = runner.invoke(app, ["audit", str(bundle)])
+    assert result.exit_code == 2
+    assert json.loads(result.stdout)["issues"] == ["bundle_checksum_incomplete"]
+
+
+def test_audit_command_fails_cleanly_when_manifest_is_invalid(tmp_path: Path) -> None:
+    bundle = tmp_path / "bundle"
+    bundle.mkdir()
+    (bundle / "manifest.json").write_text("{}\n", encoding="utf-8")
+    write_checksum_file(bundle, [bundle / "manifest.json"])
     result = runner.invoke(app, ["audit", str(bundle)])
     assert result.exit_code == 2
     assert json.loads(result.stdout)["issues"] == ["bundle_checksum_incomplete"]

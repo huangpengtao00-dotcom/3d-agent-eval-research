@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import typer
+from pydantic import ValidationError
 
 from agent_eval.bundle import build_bundle
 from agent_eval.canonical import verify_checksum_file
@@ -40,7 +41,9 @@ def audit(bundle_path: Path) -> None:
     if failures or not manifest_path.is_file():
         typer.echo(json.dumps({"status": "excluded", "issues": ["bundle_checksum_incomplete"]}))
         raise typer.Exit(2)
-    manifest = BundleManifest.model_validate_json(
-        manifest_path.read_text(encoding="utf-8")
-    )
+    try:
+        manifest = BundleManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValidationError):
+        typer.echo(json.dumps({"status": "excluded", "issues": ["bundle_checksum_incomplete"]}))
+        raise typer.Exit(2) from None
     typer.echo(manifest.data_quality.model_dump_json())

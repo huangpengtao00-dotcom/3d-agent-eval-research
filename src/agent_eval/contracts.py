@@ -4,9 +4,9 @@ import json
 from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Sha256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 SafeIdentifier = Annotated[
@@ -148,6 +148,16 @@ class SourceSnapshot(StrictModel):
     lineage: list[LineageEdge]
     artifacts: list[ArtifactSource]
     standard_views: list[StandardViewSource]
+
+    @model_validator(mode="after")
+    def evidence_destinations_are_unique(self) -> Self:
+        artifact_ids = [artifact.artifact_id for artifact in self.artifacts]
+        if len(artifact_ids) != len(set(artifact_ids)):
+            raise ValueError("duplicate artifact_id")
+        view_keys = [(view.artifact_id, view.view_name) for view in self.standard_views]
+        if len(view_keys) != len(set(view_keys)):
+            raise ValueError("duplicate standard view")
+        return self
 
 
 class FileRecord(StrictModel):
