@@ -70,7 +70,7 @@ Private source adapters are not files in this repository. They must emit the doc
 - Consumes: Python 3.12 and uv.
 - Produces: importable package `agent_eval`, console entry point `agent-eval`, and standard verification commands used by every later task.
 
-- [ ] **Step 1: Write the failing package smoke test**
+- [x] **Step 1: Write the failing package smoke test**
 
 ```python
 # tests/test_package.py
@@ -81,7 +81,7 @@ def test_package_version_is_explicit() -> None:
     assert __version__ == "0.1.0"
 ```
 
-- [ ] **Step 2: Run the smoke test and verify the package is absent**
+- [x] **Step 2: Run the smoke test and verify the package is absent**
 
 Run:
 
@@ -91,7 +91,7 @@ uv run pytest tests/test_package.py -q
 
 Expected: FAIL during collection with `ModuleNotFoundError: No module named 'agent_eval'`.
 
-- [ ] **Step 3: Add package metadata and tool configuration**
+- [x] **Step 3: Add package metadata and tool configuration**
 
 ```toml
 # pyproject.toml
@@ -163,7 +163,7 @@ excluded/
 *.secrets.json
 ```
 
-- [ ] **Step 4: Sync dependencies and run the package smoke test**
+- [x] **Step 4: Sync dependencies and run the package smoke test**
 
 Run:
 
@@ -174,7 +174,7 @@ uv run pytest tests/test_package.py -q
 
 Expected: PASS with `1 passed`.
 
-- [ ] **Step 5: Run static verification**
+- [x] **Step 5: Run static verification**
 
 Run:
 
@@ -185,7 +185,7 @@ uv run mypy src
 
 Expected: both commands exit 0.
 
-- [ ] **Step 6: Commit the bootstrap**
+- [x] **Step 6: Commit the bootstrap**
 
 ```bash
 git add pyproject.toml uv.lock .gitignore src/agent_eval/__init__.py tests/__init__.py tests/test_package.py
@@ -207,7 +207,7 @@ git commit -m "build: bootstrap research data package"
 - Consumes: Pydantic 2.
 - Produces: `SourceSnapshot`, `ArtifactSource`, `StandardViewSource`, `BundleManifest`, `AuditResult`, `load_source_snapshot(path)`.
 
-- [ ] **Step 1: Write contract tests for a complete source snapshot and unknown-field rejection**
+- [x] **Step 1: Write contract tests for a complete source snapshot and unknown-field rejection**
 
 ```python
 # tests/helpers.py
@@ -301,7 +301,7 @@ def test_output_identifiers_cannot_escape_bundle_roots(tmp_path: Path) -> None:
         load_source_snapshot(source)
 ```
 
-- [ ] **Step 2: Run the tests and verify the contracts do not exist**
+- [x] **Step 2: Run the tests and verify the contracts do not exist**
 
 Run:
 
@@ -311,7 +311,7 @@ uv run pytest tests/test_contracts.py -q
 
 Expected: FAIL during collection because `agent_eval.contracts` does not exist.
 
-- [ ] **Step 3: Implement the strict contracts**
+- [x] **Step 3: Implement the strict contracts**
 
 ```python
 # src/agent_eval/contracts.py
@@ -505,7 +505,7 @@ def load_source_snapshot(path: Path) -> SourceSnapshot:
     return SourceSnapshot.model_validate(json.loads(path.read_text(encoding="utf-8")))
 ```
 
-- [ ] **Step 4: Run contract tests**
+- [x] **Step 4: Run contract tests**
 
 Run:
 
@@ -516,7 +516,7 @@ uv run mypy src
 
 Expected: tests pass and mypy exits 0.
 
-- [ ] **Step 5: Commit the contracts**
+- [x] **Step 5: Commit the contracts**
 
 ```bash
 git add src/agent_eval/contracts.py tests/helpers.py tests/test_contracts.py
@@ -537,7 +537,7 @@ git commit -m "feat: define source-neutral snapshot contracts"
 - Consumes: JSON-compatible values and filesystem paths.
 - Produces: `canonical_json_bytes(value)`, `sha256_bytes(data)`, `sha256_file(path)`, `write_checksum_file(root, files)`, `verify_checksum_file(root)`.
 
-- [ ] **Step 1: Write failing determinism and tamper-detection tests**
+- [x] **Step 1: Write failing determinism and tamper-detection tests**
 
 ```python
 # tests/test_canonical.py
@@ -582,7 +582,7 @@ def test_checksum_manifest_rejects_unlisted_and_unsafe_paths(tmp_path: Path) -> 
     assert verify_checksum_file(tmp_path) == ["../outside.json"]
 ```
 
-- [ ] **Step 2: Run tests and verify failure**
+- [x] **Step 2: Run tests and verify failure**
 
 Run:
 
@@ -592,7 +592,7 @@ uv run pytest tests/test_canonical.py -q
 
 Expected: FAIL because `agent_eval.canonical` does not exist.
 
-- [ ] **Step 3: Implement canonical serialization and checksums**
+- [x] **Step 3: Implement canonical serialization and checksums**
 
 ```python
 # src/agent_eval/canonical.py
@@ -667,7 +667,7 @@ def verify_checksum_file(root: Path) -> list[str]:
     return sorted(set(failures))
 ```
 
-- [ ] **Step 4: Run checksum tests and static checks**
+- [x] **Step 4: Run checksum tests and static checks**
 
 Run:
 
@@ -679,7 +679,7 @@ uv run mypy src
 
 Expected: all commands exit 0.
 
-- [ ] **Step 5: Commit checksum support**
+- [x] **Step 5: Commit checksum support**
 
 ```bash
 git add src/agent_eval/canonical.py tests/test_canonical.py
@@ -700,7 +700,7 @@ git commit -m "feat: add canonical serialization and checksums"
 - Consumes: `SourceSnapshot`.
 - Produces: `resolve_round_turns(snapshot) -> dict[int, tuple[str, ...]]` and `AmbiguousRoundTurnMapping`.
 
-- [ ] **Step 1: Write tests for explicit, reconstructed, and ambiguous mappings**
+- [x] **Step 1: Write tests for explicit, reconstructed, and ambiguous mappings**
 
 ```python
 # tests/test_mapping.py
@@ -745,7 +745,7 @@ def test_duplicate_round_numbers_are_rejected() -> None:
         resolve_round_turns(rebuilt)
 ```
 
-- [ ] **Step 2: Run mapping tests and verify failure**
+- [x] **Step 2: Run mapping tests and verify failure**
 
 Run:
 
@@ -755,7 +755,7 @@ uv run pytest tests/test_mapping.py -q
 
 Expected: FAIL because `agent_eval.mapping` does not exist.
 
-- [ ] **Step 3: Implement deterministic mapping**
+- [x] **Step 3: Implement deterministic mapping**
 
 ```python
 # src/agent_eval/mapping.py
@@ -806,7 +806,7 @@ def resolve_round_turns(snapshot: SourceSnapshot) -> dict[int, tuple[str, ...]]:
     return resolved
 ```
 
-- [ ] **Step 4: Correct the test import and run all mapping tests**
+- [x] **Step 4: Correct the test import and run all mapping tests**
 
 Replace the unused `dataclasses` import in `tests/test_mapping.py` with no import, then run:
 
@@ -817,7 +817,7 @@ uv run ruff check src/agent_eval/mapping.py tests/test_mapping.py
 
 Expected: all tests pass and Ruff exits 0.
 
-- [ ] **Step 5: Commit mapping resolution**
+- [x] **Step 5: Commit mapping resolution**
 
 ```bash
 git add src/agent_eval/mapping.py tests/test_mapping.py
@@ -838,7 +838,7 @@ git commit -m "feat: resolve round to turn identity"
 - Consumes: source directory, bundle directory, `ArtifactSource`, `StandardViewSource`.
 - Produces: `resolve_source_path(...) -> Path`, `import_artifacts(...) -> list[FileRecord]`, `import_standard_views(...) -> list[FileRecord]`, `UnsafeSourcePath`, and `EvidenceHashMismatch`.
 
-- [ ] **Step 1: Write tests for copying, hashing, and path traversal rejection**
+- [x] **Step 1: Write tests for copying, hashing, and path traversal rejection**
 
 ```python
 # tests/test_artifacts.py
@@ -913,7 +913,7 @@ def test_import_rejects_bytes_that_do_not_match_source_inventory(tmp_path: Path)
         import_artifacts(source, tmp_path / "bundle", [artifact])
 ```
 
-- [ ] **Step 2: Run artifact tests and verify failure**
+- [x] **Step 2: Run artifact tests and verify failure**
 
 Run:
 
@@ -923,7 +923,7 @@ uv run pytest tests/test_artifacts.py -q
 
 Expected: FAIL because `agent_eval.artifacts` does not exist.
 
-- [ ] **Step 3: Implement safe byte import**
+- [x] **Step 3: Implement safe byte import**
 
 ```python
 # src/agent_eval/artifacts.py
@@ -1023,7 +1023,7 @@ def import_standard_views(
     return records
 ```
 
-- [ ] **Step 4: Run artifact tests and type checks**
+- [x] **Step 4: Run artifact tests and type checks**
 
 Run:
 
@@ -1035,7 +1035,7 @@ uv run mypy src
 
 Expected: all commands exit 0.
 
-- [ ] **Step 5: Commit artifact import**
+- [x] **Step 5: Commit artifact import**
 
 ```bash
 git add src/agent_eval/artifacts.py tests/test_artifacts.py
@@ -1056,7 +1056,7 @@ git commit -m "feat: import checksum-covered evidence bytes"
 - Consumes: source directory, validated `SourceSnapshot`, resolved round mapping.
 - Produces: `build_bundle(source_root, output_root, disclosure_class) -> Path` containing source records, artifacts, views, manifest, and `checksums.sha256`.
 
-- [ ] **Step 1: Write a failing end-to-end bundle test**
+- [x] **Step 1: Write a failing end-to-end bundle test**
 
 ```python
 # tests/test_bundle.py
@@ -1103,7 +1103,7 @@ def test_build_bundle_freezes_source_and_bytes(tmp_path: Path) -> None:
     assert verify_checksum_file(bundle) == []
 ```
 
-- [ ] **Step 2: Run the bundle test and verify failure**
+- [x] **Step 2: Run the bundle test and verify failure**
 
 Run:
 
@@ -1113,7 +1113,7 @@ uv run pytest tests/test_bundle.py -q
 
 Expected: FAIL because `agent_eval.bundle` does not exist.
 
-- [ ] **Step 3: Implement deterministic bundle assembly**
+- [x] **Step 3: Implement deterministic bundle assembly**
 
 ```python
 # src/agent_eval/bundle.py
@@ -1248,7 +1248,7 @@ def build_bundle(
     return bundle
 ```
 
-- [ ] **Step 4: Run bundle and checksum tests**
+- [x] **Step 4: Run bundle and checksum tests**
 
 Run:
 
@@ -1260,7 +1260,7 @@ uv run mypy src
 
 Expected: all commands exit 0.
 
-- [ ] **Step 5: Commit bundle assembly**
+- [x] **Step 5: Commit bundle assembly**
 
 ```bash
 git add src/agent_eval/bundle.py tests/test_bundle.py
@@ -1282,7 +1282,7 @@ git commit -m "feat: assemble immutable evidence bundles"
 - Consumes: bundle directory and validated source snapshot.
 - Produces: `audit_snapshot(snapshot, source_root) -> AuditResult`, updated `manifest.json`, `quality/audit.json`, and a machine-readable exclusion record for excluded attempts.
 
-- [ ] **Step 1: Write failing tests for complete, partial, and excluded outcomes**
+- [x] **Step 1: Write failing tests for complete, partial, and excluded outcomes**
 
 ```python
 # tests/test_audit.py
@@ -1387,7 +1387,7 @@ def test_unsupported_source_schema_is_excluded(tmp_path: Path) -> None:
     assert "unsupported_source_schema" in result.issues
 ```
 
-- [ ] **Step 2: Run audit tests and verify failure**
+- [x] **Step 2: Run audit tests and verify failure**
 
 Run:
 
@@ -1397,7 +1397,7 @@ uv run pytest tests/test_audit.py -q
 
 Expected: FAIL because `agent_eval.audit` does not exist.
 
-- [ ] **Step 3: Implement the quality gates**
+- [x] **Step 3: Implement the quality gates**
 
 ```python
 # src/agent_eval/audit.py
@@ -1498,11 +1498,11 @@ def audit_snapshot(snapshot: SourceSnapshot, source_root: Path) -> AuditResult:
     )
 ```
 
-- [ ] **Step 4: Fix the partial test so non-target gates remain valid**
+- [x] **Step 4: Fix the partial test so non-target gates remain valid**
 
 In `test_missing_round_call_is_partial_only_for_cost_analysis`, create the same artifact and six view files used by the complete test before calling `audit_snapshot`. Do not weaken the audit function to make a malformed fixture pass.
 
-- [ ] **Step 5: Integrate audit output into bundle assembly**
+- [x] **Step 5: Integrate audit output into bundle assembly**
 
 Add these imports to `src/agent_eval/bundle.py`:
 
@@ -1630,7 +1630,7 @@ def test_missing_artifact_builds_excluded_bundle_and_index(tmp_path: Path) -> No
     assert verify_checksum_file(bundle) == []
 ```
 
-- [ ] **Step 6: Run audit and bundle tests**
+- [x] **Step 6: Run audit and bundle tests**
 
 Run:
 
@@ -1642,7 +1642,7 @@ uv run mypy src
 
 Expected: all commands exit 0.
 
-- [ ] **Step 7: Commit the audit engine**
+- [x] **Step 7: Commit the audit engine**
 
 ```bash
 git add src/agent_eval/audit.py src/agent_eval/bundle.py tests/test_audit.py tests/test_bundle.py
@@ -1663,7 +1663,7 @@ git commit -m "feat: audit trajectory evidence quality"
 - Consumes: source directory or bundle directory supplied by the operator.
 - Produces: `agent-eval bundle SOURCE OUTPUT`, `agent-eval audit BUNDLE`, stable JSON output, and nonzero exit codes for excluded or tampered bundles.
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 ```python
 # tests/test_cli.py
@@ -1700,7 +1700,7 @@ def test_audit_command_fails_on_tampered_bundle(tmp_path: Path) -> None:
     assert json.loads(result.stdout)["issues"] == ["bundle_checksum_incomplete"]
 ```
 
-- [ ] **Step 2: Run CLI tests and verify failure**
+- [x] **Step 2: Run CLI tests and verify failure**
 
 Run:
 
@@ -1710,7 +1710,7 @@ uv run pytest tests/test_cli.py -q
 
 Expected: FAIL because `agent_eval.cli` does not exist.
 
-- [ ] **Step 3: Implement the CLI**
+- [x] **Step 3: Implement the CLI**
 
 ```python
 # src/agent_eval/cli.py
@@ -1761,11 +1761,11 @@ def audit(bundle_path: Path) -> None:
     typer.echo(manifest.data_quality.model_dump_json())
 ```
 
-- [ ] **Step 4: Make the complete CLI fixture actually complete**
+- [x] **Step 4: Make the complete CLI fixture actually complete**
 
 Extend `test_bundle_command_prints_machine_readable_result` with one synthetic model artifact, one producing step, one lineage edge, and the six required view files exactly as declared in `tests/test_audit.py`. The expected status remains `complete` because all gates pass, not because the CLI bypasses them.
 
-- [ ] **Step 5: Run CLI and full unit tests**
+- [x] **Step 5: Run CLI and full unit tests**
 
 Run:
 
@@ -1777,7 +1777,7 @@ uv run mypy src
 
 Expected: all commands exit 0.
 
-- [ ] **Step 6: Commit CLI support**
+- [x] **Step 6: Commit CLI support**
 
 ```bash
 git add src/agent_eval/cli.py tests/test_cli.py
@@ -1807,7 +1807,7 @@ git commit -m "feat: add evidence bundle audit CLI"
 - Consumes: source-neutral contract and CLI from Tasks 2–8.
 - Produces: reviewable synthetic fixtures, handoff documentation, and a repository-wide public-safety test.
 
-- [ ] **Step 1: Write a failing public-safety test**
+- [x] **Step 1: Write a failing public-safety test**
 
 ```python
 # tests/test_public_safety.py
@@ -1839,7 +1839,7 @@ def test_public_files_contain_no_identifying_or_secret_patterns() -> None:
     assert failures == []
 ```
 
-- [ ] **Step 2: Run the safety test before adding documentation**
+- [x] **Step 2: Run the safety test before adding documentation**
 
 Run:
 
@@ -1849,7 +1849,7 @@ uv run pytest tests/test_public_safety.py -q
 
 Expected: PASS on the existing source-neutral repository. This establishes the guard before adding fixtures and documentation.
 
-- [ ] **Step 3: Write the source export contract**
+- [x] **Step 3: Write the source export contract**
 
 Create `docs/source-export-contract.md` with these exact normative sections:
 
@@ -1900,9 +1900,9 @@ Simulator termination decisions, gold annotations, production feedback, and auto
 The adapter fails closed on missing required records, unsupported schema versions, path traversal, direct identifiers, credentials, or inconsistent source reads. It never fabricates a mapping or silently drops a required artifact.
 ```
 
-- [ ] **Step 4: Add complete and partial synthetic fixtures**
+- [x] **Step 4: Add complete and partial synthetic fixtures**
 
-Use the object returned by `minimum_snapshot()` as the base. For `source_complete`, add the model artifact, producing step, lineage edge, and six views from `tests/test_audit.py`. Write exactly `b"model"` to `files/model.glb` and exactly `b"png"` to each view so the declared SHA-256 and byte lengths match. For `source_partial`, copy the complete fixture byte-for-byte and change only:
+Use the object returned by `minimum_snapshot()` as the base. For `source_complete`, add the model artifact, producing step, lineage edge, and six views from `tests/test_audit.py`. Use fixed text fixture bytes ending in one newline (`b"model\n"` and `b"png\n"`) and declare their exact SHA-256 values and byte lengths. For `source_partial`, copy the complete fixture byte-for-byte and change only:
 
 ```json
 {
@@ -1914,7 +1914,7 @@ Use the object returned by `minimum_snapshot()` as the base. For `source_complet
 
 Preserve every other required attempt field when applying that change.
 
-- [ ] **Step 5: Add fixture-driven integration tests to `tests/test_cli.py`**
+- [x] **Step 5: Add fixture-driven integration tests to `tests/test_cli.py`**
 
 ```python
 def test_complete_fixture_builds_clean_bundle(tmp_path: Path) -> None:
@@ -1939,7 +1939,7 @@ def test_partial_fixture_preserves_content_quality_eligibility(tmp_path: Path) -
     assert payload["issues"] == ["missing_round_simulator_call_record"]
 ```
 
-- [ ] **Step 6: Run the complete Phase A verification suite**
+- [x] **Step 6: Run the complete Phase A verification suite**
 
 Run:
 
@@ -1952,7 +1952,7 @@ git diff --check
 
 Expected: all commands exit 0; pytest reports zero failures.
 
-- [ ] **Step 7: Run an explicit repository disclosure scan**
+- [x] **Step 7: Run an explicit repository disclosure scan**
 
 Run:
 
@@ -1965,7 +1965,7 @@ git grep -n -E "${url_pattern}|${issue_pattern}" -- ':!uv.lock' ':!tests/test_pu
 
 Expected: the safety test passes; `git grep` prints no matches and exits 1 because no forbidden pattern is found.
 
-- [ ] **Step 8: Manually inspect the generated bundle layout**
+- [x] **Step 8: Manually inspect the generated bundle layout**
 
 Run:
 
@@ -1981,7 +1981,7 @@ Expected:
 - the file list contains manifest, source records, artifact bytes, six views, audit record, and checksum file;
 - the audit command exits 0 with no issues.
 
-- [ ] **Step 9: Commit the handoff contract and fixtures**
+- [x] **Step 9: Commit the handoff contract and fixtures**
 
 ```bash
 git add docs/source-export-contract.md tests/fixtures tests/test_cli.py tests/test_public_safety.py
